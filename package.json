@@ -1,0 +1,25 @@
+{
+  "name": "typescript-node-crud-apisn",
+  "version": "1.0.0",
+  "description": "TypeScript based node js basic CRUD apis with MongoDB",
+  "main": "app.js",
+  "scripts": {
+    "test": "node app.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sanjaydeveloper15/typescript-node-crud-apis.git"
+  },
+  "keywords": [
+    "TypeScript",
+    "Nodejs",
+    "MongoDB",
+    "CRUD"
+  ],
+  "author": "Sanjay Kumar",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sanjaydeveloper15/typescript-node-crud-apis/issues"
+  },
+  "homepage": "https://github.com/sanjaydeveloper15/typescript-node-crud-apis#readme"
+}
