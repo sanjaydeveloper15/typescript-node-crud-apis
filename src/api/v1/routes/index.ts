@@ -1,6 +1,6 @@
 import express from "express"
 // import { verifyApiKey } from "../middlewares/authMiddleware.js"
-import userRoute from "./userRoute.js"
+import userRoute from "./user.route.js"
 
 // const swaggerDocument = JSON.parse(
 //   await readFile(new URL("../../../../swagger-output.json", import.meta.url))

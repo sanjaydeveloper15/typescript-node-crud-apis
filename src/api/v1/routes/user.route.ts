@@ -1,21 +1,23 @@
-import express from "express"
-// import userController from '../controllers/userController.js'
+import express, { Request, Response, NextFunction } from "express"
+// import userController from '../controllers/user.controller';
 // import { verifySuperAdminToken, verifyUserToken, verifyInstituteToken } from '../middlewares/authMiddleware.js'
-// import userValidation from '../validations/userValidation.js'
-// import responseMiddleware from '../middlewares/responseMiddleware.js'
+import userValidation from '../validations/user.validations.js';
+// import responseMiddleware from '../middlewares/response.middleware'
 
 const userRoute = express.Router()
 //userRoute.use(multer().array())
 
 //get routes
-userRoute.get('/',(req,res)=>{
+userRoute.get('/', (req, res) => {
     res.send(`${process.env.APP_NAME}: User Routes`)
 })
 // userRoute.get('/admin/list', verifySuperAdminToken, userValidation.getAdminsValidator, userController.getAdminsList, responseMiddleware)
 // userRoute.get('/employee/list', verifyUserToken, userController.getEmployeesList, responseMiddleware)
 
 //post routes
-// userRoute.post('/create/admin', verifySuperAdminToken, uploadSingleImg, userValidation.signupValidator, userController.addAdmin, responseMiddleware)
+userRoute.post('/create', userValidation.signupValidator, (req: Request, res: Response, next: NextFunction) => {
+    res.send({})
+})
 
 //put routes
 // userRoute.put('/institute/person/update', verifyInstituteToken, uploadSingleImg, userValidation.updateValidator, userController.updateInstitutePerson, responseMiddleware)

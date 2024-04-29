@@ -1,20 +1,19 @@
 import jwt from 'jsonwebtoken';
 // import { getReqToken, getReqLang } from '../helpers/functions.js';
 // import messages from '../helpers/messages.js';
-import responseMiddleware from './responseMiddleware.js';
 // import { ROLE } from '../utils/constants.js';
 
-// const createUserToken = async(id,email,role) => {
-//     try{
-//         let obj = {"id":id, "email": email, "role": role}; //console.log(obj);
-//         const token = jwt.sign(obj, process.env.JWT_TOKEN_KEY, {
-//             expiresIn: process.env.JWT_TOKEN_EXP
-//         })
-//         return token
-//     }catch(err){
-//         return ''
-//     }
-// }
+const createUserToken = async(id:string,email:string,role:string) => {
+    try{
+        const obj = {"id":id, "email": email, "role": role}; //console.log(obj);
+        const token = jwt.sign(obj, "tokenKey", {
+            expiresIn: process.env.JWT_TOKEN_EXP
+        })
+        return token
+    }catch(err){
+        return ''
+    }
+}
 
 // const verifyUserToken = (req, res, next) => {
 //     try{
@@ -78,7 +77,7 @@ import responseMiddleware from './responseMiddleware.js';
 // }
 
 export { 
-    // createUserToken,
+    createUserToken,
     // verifyUserToken,
     // verifySuperAdminToken,
     // verifyApiKey,

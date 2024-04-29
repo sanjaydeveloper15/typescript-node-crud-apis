@@ -1,13 +1,7 @@
 import mongoose from 'mongoose'
-import { readFile } from 'fs/promises'
-// import User from './userModel.js'
+import User from './user.model.js'
 // import Bank from './bankModel.js'
 
-// const server = JSON.parse(
-//   await readFile(
-//     new URL('../../../../config/server.json', import.meta.url)
-//   )
-// )
 
 const server = {
   "appName": "CRUD API's with TypeScript",
@@ -26,7 +20,7 @@ const connectDb = () => {
   return connect
 }
 
-const models = { }
+const models = { User }
 
 export { connectDb }
 
