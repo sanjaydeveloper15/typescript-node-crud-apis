@@ -1,4 +1,4 @@
-import { Request } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import userModel from '../models/user.model.js';
 import { hashPassword, checkPassword, objectFilter, generatePassword } from '../utils/helpers/functions.js';
 import messages from '../utils/helpers/messages.js';
@@ -41,7 +41,7 @@ const getAllAdmins = async(req: Request) => {
 // 	return await userModel.find(condition).select(commonSelect);
 // }
 
-const getUser = async(id:string,token:string) => {
+const getUser = async(id:string,token:string = '') => {
 	let resultObj:any = {};
 	const user:any = await userModel.findOne({'_id':id})
 
@@ -89,25 +89,23 @@ const createAdmin = async (req: Request) => {
     return resultObj;
 };
 
-// const updateAdmin = async (req) => {
-// 	let resultObj = {};
+const updateAdminUser = async (req: Request) => {
+	let resultObj:any = {};
 
-//     const prepareObject = {
-//         email: req.body.email,
-//         name: req.body.name,
-//         role: ROLE.ADMIN,
-//         superAdminId: req.user.id,
-//         countryCode: req.body.countryCode,
-//         mobile: req.body.mobile,
-//         profileImage: (req.file) ? imgPath + req.file.filename : ''
-//     };
-// 	await userModel.findOneAndUpdate({"_id":req.body.userId},await objectFilter(prepareObject))
+    const prepareObject = {
+        email: req.body.email,
+        name: req.body.name,
+        role: ROLE.ADMIN,
+        countryCode: req.body.countryCode,
+        mobile: req.body.mobile
+    };
+	await userModel.findOneAndUpdate({"_id":req.body.userId},await objectFilter(prepareObject))
 
-//     resultObj.data = await getUser(req.body.userId);
-//     resultObj.okay = true;
-//     resultObj.message = messages('en')['user_updated'];
-// 	return resultObj;
-// };
+    resultObj.data = await getUser(req.body.userId);
+    resultObj.okay = true;
+    resultObj.message = messages('en')['user_updated'];
+	return resultObj;
+};
 
 // const createEmployee = async (req) => {
 // 	let resultObj = {},
@@ -310,5 +308,6 @@ const createAdmin = async (req: Request) => {
 export {
     createAdmin,
     getUser,
-    getAllAdmins
+    getAllAdmins,
+    updateAdminUser
 }

@@ -14,19 +14,19 @@ console.log(req.body)
     await validate(v, res, next, req)
 }
 
-// const updateValidator = async (req, res, next) => {
-//     // let checkOkay = uniqueWithIgnore('users',req.body.userId,'email',req.body.email,req,res);
-//     // if(checkOkay){
-//         const v = new Validator(req.body, {
-//             userId: validations.userIdExists,
-//             name: validations.name,
-//             email: validations.email,
-//             countryCode: validations.countryCode,
-//             mobile: validations.mobile
-//         })
-//         validate(v, res, next, req)
-//     //}
-// }
+const updateValidator = async (req: Request, res: Response, next: NextFunction) => {
+    // let checkOkay = uniqueWithIgnore('users',req.body.userId,'email',req.body.email,req,res);
+    // if(checkOkay){
+        const v = new Validator(req.body, {
+            userId: validations.userIdExists,
+            name: validations.name,
+            email: validations.email,
+            countryCode: validations.countryCode,
+            mobile: validations.mobile
+        })
+        validate(v, res, next, req)
+    //}
+}
 
 // const loginValidator = async (req, res, next) => {
 
@@ -65,6 +65,7 @@ console.log(req.body)
 
 const userValidation = { 
     signupValidator,
+    updateValidator
 };
 
 export default userValidation;

@@ -18,7 +18,7 @@ userRoute.get('/list', userController.getAdminsList, responseMiddleware)
 userRoute.post('/create', userValidation.signupValidator, userController.addAdmin, responseMiddleware)
 
 //put routes
-// userRoute.put('/institute/person/update', verifyInstituteToken, uploadSingleImg, userValidation.updateValidator, userController.updateInstitutePerson, responseMiddleware)
+userRoute.put('/update', userValidation.updateValidator, userController.updateAdmin, responseMiddleware)
 // userRoute.put('/verified/set/new/password', multer().array(), forgotPasswordValidation.passwordValidator, forgotPasswordController.passwordRequest, responseMiddleware)
 
 //delete routes
