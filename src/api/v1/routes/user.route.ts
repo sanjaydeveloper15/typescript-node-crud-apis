@@ -11,7 +11,7 @@ const userRoute = express.Router()
 userRoute.get('/', (req, res) => {
     res.send(`${process.env.APP_NAME}: User Routes`)
 })
-// userRoute.get('/admin/list', verifySuperAdminToken, userValidation.getAdminsValidator, userController.getAdminsList, responseMiddleware)
+userRoute.get('/list', userController.getAdminsList, responseMiddleware)
 // userRoute.get('/employee/list', verifyUserToken, userController.getEmployeesList, responseMiddleware)
 
 //post routes

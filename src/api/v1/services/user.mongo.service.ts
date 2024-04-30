@@ -5,7 +5,7 @@ import messages from '../utils/helpers/messages.js';
 import { createUserToken } from '../middlewares/auth.middleware.js';
 import { ROLE } from '../utils/constants/common.constant.js';
 
-// const commonSelect = {_id: 1, name: 1, email: 1, countryCode: 1, mobile: 1, profileImage: 1, role: 1, employeeType: 1, employeeQualification: 1, address: 1, createdAt: 1};
+const commonSelect = {_id: 1, name: 1, email: 1, countryCode: 1, mobile: 1, profileImage: 1, role: 1, employeeType: 1, employeeQualification: 1, address: 1, createdAt: 1};
 
 // const imgPath = "/assets/uploads/images/";
 
@@ -13,10 +13,10 @@ import { ROLE } from '../utils/constants/common.constant.js';
 // 	return await userModel.find();
 // }
 
-// const getAllAdmins = async(req) => {
-//     let condition = (req.query.employeeType) ? { 'role':ROLE.ADMIN, 'employeeType':req.query.employeeType }: {'role':ROLE.ADMIN};
-// 	return await userModel.find(condition).select(commonSelect);
-// }
+const getAllAdmins = async(req: Request) => {
+    let condition = (req.query.employeeType) ? { 'role':ROLE.ADMIN, 'employeeType':req.query.employeeType }: {'role':ROLE.ADMIN};
+	return await userModel.find(condition).select(commonSelect);
+}
 
 // const getAllEmployess = async(req) => {
 //     let condition = (req.query.adminId) ? {'role':ROLE.EMPLOYEE, 'adminId':req.query.adminId} : {'role':ROLE.EMPLOYEE}; 
@@ -309,5 +309,6 @@ const createAdmin = async (req: Request) => {
 
 export {
     createAdmin,
-    getUser
+    getUser,
+    getAllAdmins
 }

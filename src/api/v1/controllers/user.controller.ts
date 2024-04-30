@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { createAdmin, getUser } from '../services/user.mongo.service.js';
+import { createAdmin, getUser, getAllAdmins } from '../services/user.mongo.service.js';
 import { setCustomResponse, mailOptions, objectFilter } from '../utils/helpers/functions.js';
 // import mailService from '../services/mailService.js';
 // // Note: Admin or Clients are same!
@@ -7,7 +7,7 @@ import { setCustomResponse, mailOptions, objectFilter } from '../utils/helpers/f
 
 const addAdmin = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user = await createAdmin(req);
+        const user:any = await createAdmin(req);
         if(user.okay){
             const context = {
                 name: req.body.name,
@@ -35,16 +35,16 @@ const addAdmin = async (req: Request, res: Response, next: NextFunction) => {
 //     }
 // };
 
-// userController.getAdminsList = async (req, res, next) => {
-//     try {
-//         const list = await userService.getAllAdmins(req);
-//         setCustomResponse(req, 200, true, 0, list, 'success');
-//         next();
-//     } catch (err) {
-//         setCustomResponse(req,500,false,1,'',err.message)
-//         next();
-//     }
-// }
+const getAdminsList = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const list:any = await getAllAdmins(req);
+        setCustomResponse(req, 200, true, 0, list, 'success');
+        next();
+    } catch (err:any) {
+        setCustomResponse(req,500,false,1,'',err.message)
+        next();
+    }
+}
 
 // userController.addEmployee = async (req, res, next) => {
 //     try {
@@ -184,7 +184,8 @@ const addAdmin = async (req: Request, res: Response, next: NextFunction) => {
 // }
 
 const userController = {
-    addAdmin
+    addAdmin,
+    getAdminsList
 }
 
 export default userController;
