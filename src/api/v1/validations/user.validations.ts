@@ -55,17 +55,18 @@ const updateValidator = async (req: Request, res: Response, next: NextFunction) 
 //     validate(v, res, next, req)
 // }
 
-// const deleteUserValidator = async (req, res, next) => {
-//     const v = new Validator(req.body, {
-//         id: validations.userIdExists
-//     })
+const deleteUserValidator = async (req: Request, res: Response, next: NextFunction) => {
+    const v = new Validator(req.body, {
+        id: validations.userIdExists
+    })
 
-//     validate(v, res, next, req)
-// }
+    validate(v, res, next, req)
+}
 
 const userValidation = { 
     signupValidator,
-    updateValidator
+    updateValidator,
+    deleteUserValidator
 };
 
 export default userValidation;

@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import { createAdmin, getAllAdmins, updateAdminUser } from '../services/user.mongo.service.js';
+import { createAdmin, getAllAdmins, updateAdminUser, removeUser } from '../services/user.mongo.service.js';
 import { setCustomResponse, mailOptions, objectFilter } from '../utils/helpers/functions.js';
 // import mailService from '../services/mailService.js';
 // // Note: Admin or Clients are same!
@@ -172,21 +172,22 @@ const getAdminsList = async (req: Request, res: Response, next: NextFunction) =>
 //     }
 // };
 
-// userController.deleteUser = async (req, res, next) => {
-//     try {
-//         const user = await userService.deleteUser(req.body.id);
-//         (user.okay) ? setCustomResponse(req, 200, true, 0, user.data, user.message) : setCustomResponse(req, 400, false, 1, '', user.message);
-//         next();
-//     } catch (err) {
-//         setCustomResponse(req,500,false,1,'',err.message)
-//         next();
-//     }
-// }
+const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+        const user = await removeUser(req.body.id);
+        (user.okay) ? setCustomResponse(req, 200, true, 0, user.data, user.message) : setCustomResponse(req, 400, false, 1, '', user.message);
+        next();
+    } catch (err:any) {
+        setCustomResponse(req,500,false,1,'',err.message)
+        next();
+    }
+}
 
 const userController = {
     addAdmin,
     getAdminsList,
-    updateAdmin
+    updateAdmin,
+    deleteUser
 }
 
 export default userController;

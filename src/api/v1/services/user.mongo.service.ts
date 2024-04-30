@@ -277,18 +277,18 @@ const updateAdminUser = async (req: Request) => {
 // 	return resultObj;
 // }
 
-// const deleteUser = async (userId) => {
-//     let deleteUsr = await userModel.deleteOne({'_id':userId});
-//     let resultObj = {};
-//     if(deleteUsr){
-//         resultObj.okay = true;
-//         resultObj.message = messages('en')['user_deleted'];
-//     }else{
-//         resultObj.okay = false;
-//         resultObj.message = 'User not found.';
-//     }
-//     return resultObj;
-// }
+const removeUser = async (userId:string) => {
+    let deleteUsr = await userModel.deleteOne({'_id':userId});
+    let resultObj:any = {};
+    if(deleteUsr){
+        resultObj.okay = true;
+        resultObj.message = messages('en')['user_deleted'];
+    }else{
+        resultObj.okay = false;
+        resultObj.message = 'User not found.';
+    }
+    return resultObj;
+}
 
 // const updatePassword = async (userId, password) => {
 //     return await userModel.updateOne({'_id': userId},{'password': await hashPassword(password)});
@@ -309,5 +309,6 @@ export {
     createAdmin,
     getUser,
     getAllAdmins,
-    updateAdminUser
+    updateAdminUser,
+    removeUser
 }
