@@ -57,9 +57,10 @@ const validate = async (v: any, res: Response, next: NextFunction, req: Request)
     if (!matched) {
         console.log('validate in');
         req.body.code = 0;
-        req.statusCode = 400; //set bad request
+        req.body.statusCode = 400; //set bad request
         req.body.status = false; //set false request
-        responseMiddleware(req, res, getErrorMessage(req, v.errors));
+        req.body.message = getErrorMessage(req, v.errors); //set error message
+        responseMiddleware(req, res);
     }
     else {
         console.log('validate out');
@@ -152,9 +153,10 @@ const uniqueWithIgnore = async (schema:any, id:string, col:string, val:string, r
         let result = await mongoose.model(schema).findOne({ col: val, '_id': { $ne: id } });
         if (result) {
             // req.code = 0
-            req.statusCode = 400 //set bad request
-            // req.status = false //set false request
-            responseMiddleware(req, res, `${col} is already exists!`);
+            req.body.statusCode = 400 //set bad request
+            req.body.status = false //set false request
+            req.body.message = `${col} is already exists!`; //set error message
+            responseMiddleware(req, res);
         } else {
             return true
         }

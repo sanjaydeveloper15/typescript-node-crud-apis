@@ -1,8 +1,8 @@
 import express, { Request, Response, NextFunction } from "express"
-// import userController from '../controllers/user.controller';
+import userController from '../controllers/user.controller.js';
 // import { verifySuperAdminToken, verifyUserToken, verifyInstituteToken } from '../middlewares/authMiddleware.js'
 import userValidation from '../validations/user.validations.js';
-// import responseMiddleware from '../middlewares/response.middleware'
+import responseMiddleware from '../middlewares/response.middleware.js'
 
 const userRoute = express.Router()
 //userRoute.use(multer().array())
@@ -15,9 +15,7 @@ userRoute.get('/', (req, res) => {
 // userRoute.get('/employee/list', verifyUserToken, userController.getEmployeesList, responseMiddleware)
 
 //post routes
-userRoute.post('/create', userValidation.signupValidator, (req: Request, res: Response, next: NextFunction) => {
-    res.send({})
-})
+userRoute.post('/create', userValidation.signupValidator, userController.addAdmin, responseMiddleware)
 
 //put routes
 // userRoute.put('/institute/person/update', verifyInstituteToken, uploadSingleImg, userValidation.updateValidator, userController.updateInstitutePerson, responseMiddleware)
