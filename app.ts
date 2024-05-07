@@ -44,7 +44,7 @@ app.use((req: Request, res: Response) => {
   const error = new Error("Url not found!")
   // res.statusCode = 404
   // res.send({'error':error})
-  responseMiddleware(req, res, error.message, 404)
+  responseMiddleware(req, res)
 })
 
 //if connect db & listen server on mentioned port
