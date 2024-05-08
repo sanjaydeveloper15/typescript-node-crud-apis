@@ -2,7 +2,9 @@
 
 A Node.js with Express.js CRUD apis project with Standard way to use of TypeScript in Node.js.
 
-![alt text](https://image.ibb.co/nAd9OF/logos.png "Node Typescript")
+<p align="center">
+  <img src="https://image.ibb.co/nAd9OF/logos.png" alt="Node TypeScript - Education Funda"/>
+</p>
 
 - Create, Remove/Delete, Update and Listing API's included in it.
 - Standard way to use TypeScript added with Node.js.
