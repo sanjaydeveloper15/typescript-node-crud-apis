@@ -41,12 +41,12 @@ const convertDynamicVarLang = (lang: string, varr: string) => {
     return varr
 }
 const setCustomResponse = (req: Request, statusCode = 200, status = false, code = 1, data = '', msg = '', totalCount = 0) => {
-    console.log(`custom resp msg => ${msg}`)
+    console.log(`custom resp msg => ${msg}, statusCode => ${statusCode}`)
     req.body.status = status
     req.body.data = (data != '') ? data : {}
     req.body.totalCount = totalCount
     req.body.message = msg
-    req.statusCode = statusCode
+    req.body.statusCode = statusCode
     req.body.lang = req.body.language
 }
 const checkPassword = async (password: string, hash: string) => {

@@ -22,3 +22,16 @@ export const CASE_STATUS = {
     CASE_ASSIGNED: 1,
     NOTICE_SEND: 2
 }
+
+export const ERROR_TYPES = {
+    VALIDATION_ERROR: "ValidationError",
+    ERROR: "Error", // generic error
+    REFERENCE_ERROR: "ReferenceError", // variable not exists
+    TYPE_ERROR: "TypeError", // operation incomplete
+    SYNTAX_ERROR: "SyntaxError",
+    URI_ERROR: "URIError",
+    EVAL_ERROR: "EvalError",
+    RANGE_ERROR: "RangeError",
+    AGGREGATE_ERROR: "AggregateError", // multiple errors ground, useful for Promises
+    MONGO_SERVER_ERROR: "MongoServerError"
+}

@@ -1,0 +1,197 @@
+openapi: "3.0.0"
+info:
+  title: "TypeScript Node CRUD Docs"
+  version: "1.0.0"
+  description: "TypeScript based node js basic CRUD apis with MongoDB"
+  license:
+    name: "MIT"
+servers:
+  - url: "http://localhost:5003/api/v1"
+  - url: "https://uat.myserver.com/api/v1"
+tags:
+  - name: "User"
+    description: "User related CRUD APIs."
+paths:
+  /user/create:
+    post:
+      tags:
+        - "User"
+      summary: "create a new user"
+      description: "You can create normal users or customers with this api."
+      operationId: "createUser"
+      externalDocs:
+        description: "Full guide on create a user"
+        url: "XXXXXXXXXXXXXXXXX"
+      # parameters:
+      #   - name: "name"
+      #     in: "body"
+      #     required: true
+      #     schema:
+      #       type: "string"
+      #   - name: "email"
+      #     in: "body"
+      #     required: true
+      #     schema:
+      #       type: "string"
+      #   - name: "countryCode"
+      #     in: "body"
+      #     required: true
+      #     schema:
+      #       type: "string"
+      #   - name: "mobile"
+      #     in: "body"
+      #     required: true
+      #     schema:
+      #       type: "string"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: "object"
+              example:
+                name: "Sanjay Kumar"
+                email: "sanjay.kumar@tataaig.com"
+                countryCode: "91"
+                mobile: "9971167015"
+      responses:
+        200:
+          description: "Successful response"
+          content:
+            application/json: {}
+          # links:
+          #   CreateNewUser:
+          #     operationId: createNewUser
+          #     parameters:
+          #       userId: "$response.body#/id"
+          #     description: "Create a new user"
+          #   Documentation:
+          #     description: "View additional documentation for creating users"
+          #     url: "https://example.com/create-user-docs"
+        400:
+          description: "Bad Request"
+          content:
+            application/json: {}
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json: {}
+  /user/list:
+    get:
+      tags:
+        - "User"
+      summary: "listing api for all the user"
+      description: "You can list all the users with this api."
+      operationId: "listUser"
+      responses:
+        200:
+          description: "Successful response"
+          content:
+            application/json: {}
+        400:
+          description: "Bad Request"
+          content:
+            application/json: {}
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json: {}
+  /user/update:
+    put:
+      tags:
+        - "User"
+      summary: "update a user data"
+      description: "You can update user data with this api."
+      operationId: "updateUser"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object"
+              example:
+                userId: "663105e645c2e4af5d7529fa"
+                name: "Sanjay Kumar"
+                email: "sanjay.kumar14@tataaig.com"
+                countryCode: "91"
+                mobile: "9971167015"
+      responses:
+        200:
+          description: "Successful response"
+          content:
+            application/json: {}
+        400:
+          description: "Bad Request"
+          content:
+            application/json: {}
+        500:
+          description: "Internal Server Error"
+          content:
+            application/json: {}
+          url: "http://ref.com"
+  /user/remove:
+    delete:
+      tags:
+        - "User"
+      summary: "delete a user"
+      description: "You can delete a user with this api via object id."
+      operationId: "removeUser"
+      parameters:
+        - name: "id"
+          required: true,
+          in: "body"
+          content: 
+            application/x-www-form-urlencoded: {}
+          schema: 
+            type: "string"
+            example:
+              id: "XXXXXXXXXXXXXXXXXXXXXXXX"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: "object" # raw object
+              example:
+                id: "XXXXXXXXXXXXXXXXXXXXXXXX"
+      responses:
+        200:
+          description: "Successful response"
+          content:
+            application/json: {}
+        400:
+          description: "Bad Request"
+          content:
+            application/json: {}
+        500:
+          description: "Internal Server Error [Learn More](myErrorDescription)"
+          content:
+            application/json: {}
+          links:
+            Documentation:
+              description: "Please check more details regarding error on URL"
+              url: "https://example.com/create-user-docs"
+components:
+  schemas:
+    User:
+      type: "object"
+      properties:
+        id:
+          type: "string"
+          example: "XX3XX5e645c2e4XX5d7529XX"
+          description: "Should be 24 chars valid user id, auto generated while user creating"
+        name:
+          type: "string"
+          example: "Sanjay Kumar"
+        email:
+          type: "string"
+          example: "sanjay.kumar14@google.com"
+        countryCode:
+          type: "string"
+          example: "91"
+        mobile:
+          type: "string"
+          example: "9XX11XX015"
+      required:
+        - "name"
+        - "email"
+        - "countryCode"
+        - "mobile"

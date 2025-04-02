@@ -8,7 +8,10 @@ import responseMiddleware from './src/api/v1/middlewares/response.middleware.js'
 import { connectDb } from './src/api/v1/models/index.js'
 import router from './src/api/v1/routes/index.js'
 import path from 'path'
-
+import { load as loadYmlFile } from 'js-yaml'
+import { serve as serveSwagger, setup as setupSwagger } from 'swagger-ui-express'
+import { readFileSync } from 'fs'
+import messages from './src/api/v1/utils/helpers/messages.js'
 
 const app = express()
 const port = process.env.SERVER_PORT
@@ -38,13 +41,14 @@ app.get('/', (req, res) => {
   res.sendFile(path.resolve('./public/front/index.html'))
 })
 
+const swaggerDocument: any = loadYmlFile(readFileSync('./swagger-docs.yml', 'utf-8'));
+router.use("/docs", serveSwagger)
+router.get("/docs", setupSwagger(swaggerDocument))
+
 //404 error handling
 app.use((req: Request, res: Response) => {
-  // console.log(req)
   const error = new Error("Url not found!")
-  // res.statusCode = 404
-  // res.send({'error':error})
-  responseMiddleware(req, res)
+  res.status(404).send({ message: error.message, status: false })
 })
 
 //if connect db & listen server on mentioned port

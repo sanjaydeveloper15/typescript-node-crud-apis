@@ -1,25 +1,32 @@
 import { Request, Response, NextFunction } from 'express';
 import { createAdmin, getAllAdmins, updateAdminUser, removeUser } from '../services/user.mongo.service.js';
 import { setCustomResponse, mailOptions, objectFilter } from '../utils/helpers/functions.js';
+import { ERROR_TYPES } from '../utils/constants/common.constant.js';
 // import mailService from '../services/mailService.js';
 // // Note: Admin or Clients are same!
 
 
 const addAdmin = async (req: Request, res: Response, next: NextFunction) => {
     try {
+        console.log('invoked addAdmin')
         const user: any = await createAdmin(req);
         if (user.okay) {
+            console.log('okayy')
             const context = {
                 name: req.body.name,
                 password: user.password
             }
             setCustomResponse(req, 201, true, 0, user.data, user.message)
-        } else {
-            setCustomResponse(req, 400, false, 1, '', user.message)
         }
-        next();
     } catch (err: any) {
-        setCustomResponse(req, 500, false, 1, '', err.message)
+        console.error('catch addAdmin', { errName: err.name })
+        if (ERROR_TYPES.VALIDATION_ERROR === err.name) {
+            setCustomResponse(req, 400, false, 1, '', err.message)
+        } else {
+            setCustomResponse(req, 500, false, 1, '', err.message)
+        }
+    } finally {
+        console.info('invoked finally addAdmin')
         next();
     }
 };
@@ -177,8 +184,8 @@ const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
         const user = await removeUser(req.body.id);
         (user.okay) ? setCustomResponse(req, 200, true, 0, user.data, user.message) : setCustomResponse(req, 400, false, 1, '', user.message);
         next();
-    } catch (err:any) {
-        setCustomResponse(req,500,false,1,'',err.message)
+    } catch (err: any) {
+        setCustomResponse(req, 500, false, 1, '', err.message)
         next();
     }
 }
