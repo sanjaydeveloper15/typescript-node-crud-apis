@@ -22,27 +22,8 @@ paths:
       externalDocs:
         description: "Full guide on create a user"
         url: "XXXXXXXXXXXXXXXXX"
-      # parameters:
-      #   - name: "name"
-      #     in: "body"
-      #     required: true
-      #     schema:
-      #       type: "string"
-      #   - name: "email"
-      #     in: "body"
-      #     required: true
-      #     schema:
-      #       type: "string"
-      #   - name: "countryCode"
-      #     in: "body"
-      #     required: true
-      #     schema:
-      #       type: "string"
-      #   - name: "mobile"
-      #     in: "body"
-      #     required: true
-      #     schema:
-      #       type: "string"
+      parameters:
+        - $ref: "#/components/parameters/LanguageHeader"
       requestBody:
         required: true
         content:
@@ -83,6 +64,8 @@ paths:
       summary: "listing api for all the user"
       description: "You can list all the users with this api."
       operationId: "listUser"
+      parameters:
+        - $ref: "#/components/parameters/LanguageHeader"
       responses:
         200:
           description: "Successful response"
@@ -103,6 +86,8 @@ paths:
       summary: "update a user data"
       description: "You can update user data with this api."
       operationId: "updateUser"
+      parameters:
+        - $ref: "#/components/parameters/LanguageHeader"
       requestBody:
         content:
           application/json:
@@ -136,12 +121,13 @@ paths:
       description: "You can delete a user with this api via object id."
       operationId: "removeUser"
       parameters:
+        - $ref: "#/components/parameters/LanguageHeader"
         - name: "id"
           required: true,
           in: "body"
-          content: 
+          content:
             application/x-www-form-urlencoded: {}
-          schema: 
+          schema:
             type: "string"
             example:
               id: "XXXXXXXXXXXXXXXXXXXXXXXX"
@@ -170,6 +156,19 @@ paths:
               description: "Please check more details regarding error on URL"
               url: "https://example.com/create-user-docs"
 components:
+  parameters:
+    LanguageHeader:
+      name: "Accept-Language"
+      in: "header"
+      required: true
+      schema:
+        type: "string"
+        enum:
+          - "en"
+          - "hi"
+          - "sa"
+          - "ta"
+          - "gu"
   schemas:
     User:
       type: "object"
@@ -181,15 +180,20 @@ components:
         name:
           type: "string"
           example: "Sanjay Kumar"
+          required: true
         email:
           type: "string"
           example: "sanjay.kumar14@google.com"
+          format: "email"
+          required: true
         countryCode:
           type: "string"
           example: "91"
+          required: true
         mobile:
           type: "string"
           example: "9XX11XX015"
+          required: true
       required:
         - "name"
         - "email"
