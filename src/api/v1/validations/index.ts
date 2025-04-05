@@ -20,10 +20,12 @@ validator.extend("unique", async function ({ value, args }: ValidationArgs): Pro
         condition[column] = value;
         // Apply extra filter in condition matched
         if (excludeColumn && excludeValue !== undefined) {// e.g: email update condition
-            if(excludeColumn === 'self') {
-                const user = await mongoose.model(table).findOne({[column]: value})
+            if(excludeValue === 'self') {
+                const user = await mongoose.model(table).findOne({[column]: value});
+                if(user) {
+                    condition["_id"] = { $ne: user._id };
+                }
             }
-            condition[excludeColumn] = { $ne: excludeValue === 'self' ? value : excludeValue }; 
         }
         result = await mongoose.model(table).findOne(condition);
         return (!result) ? true : false;

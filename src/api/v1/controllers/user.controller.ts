@@ -19,7 +19,7 @@ const addAdmin = async (req: Request, res: Response, next: NextFunction) => {
         }
     } catch (err: any) {
         console.error('catch addAdmin', { errName: err.name })
-        setCustomResponse(req, ERROR_TYPES.VALIDATION_ERROR === err.name ? 400 : 500, ERROR_RESP, CODE.NOT_OKAY, {}, err.message)
+        setCustomResponse(req, ERROR_TYPES.VALIDATION_ERROR === err.name ? STATUS_CODES.BAD_REQUEST : STATUS_CODES.INTERNAL_SERVER_ERROR, ERROR_RESP, CODE.NOT_OKAY, {}, err.message)
     } finally {
         console.info('invoked finally addAdmin')
         next();
@@ -29,10 +29,10 @@ const addAdmin = async (req: Request, res: Response, next: NextFunction) => {
 const updateAdmin = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const user = await updateAdminUser(req);
-        (user.okay) ? setCustomResponse(req, 200, SUCCESS_RESP, CODE.OKAY, user.data, user.message) : setCustomResponse(req, 400, ERROR_RESP, CODE.NOT_OKAY, {}, user.message);
+        (user.okay) ? setCustomResponse(req, STATUS_CODES.SUCCESS, SUCCESS_RESP, CODE.OKAY, user.data, user.message) : setCustomResponse(req, 400, ERROR_RESP, CODE.NOT_OKAY, {}, user.message);
         next();
     } catch (err: any) {
-        setCustomResponse(req, 500, ERROR_RESP, CODE.NOT_OKAY, {}, err.message)
+        setCustomResponse(req, STATUS_CODES.INTERNAL_SERVER_ERROR, ERROR_RESP, CODE.NOT_OKAY, {}, err.message)
         next();
     }
 };
@@ -40,10 +40,10 @@ const updateAdmin = async (req: Request, res: Response, next: NextFunction) => {
 const getAdminsList = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const list: any = await getAllAdmins(req);
-        setCustomResponse(req, 200, SUCCESS_RESP, CODE.OKAY, list, 'success', list.length);
+        setCustomResponse(req, STATUS_CODES.SUCCESS, SUCCESS_RESP, CODE.OKAY, list, 'success', list.length);
         next();
     } catch (err: any) {
-        setCustomResponse(req, 500, ERROR_RESP, CODE.NOT_OKAY, {}, err.message)
+        setCustomResponse(req, STATUS_CODES.INTERNAL_SERVER_ERROR, ERROR_RESP, CODE.NOT_OKAY, {}, err.message)
         next();
     }
 }
@@ -177,10 +177,10 @@ const getAdminsList = async (req: Request, res: Response, next: NextFunction) =>
 const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const user = await removeUser(req.body.id);
-        (user.okay) ? setCustomResponse(req, 200, SUCCESS_RESP, CODE.OKAY, user.data, user.message) : setCustomResponse(req, 400, ERROR_RESP, CODE.NOT_OKAY, {}, user.message);
+        user.okay ? setCustomResponse(req, STATUS_CODES.NO_CONTENT, SUCCESS_RESP, CODE.OKAY, user.data, user.message) : setCustomResponse(req, 400, ERROR_RESP, CODE.NOT_OKAY, {}, user.message);
         next();
     } catch (err: any) {
-        setCustomResponse(req, 500, ERROR_RESP, CODE.NOT_OKAY, {}, err.message)
+        setCustomResponse(req, STATUS_CODES.INTERNAL_SERVER_ERROR, ERROR_RESP, CODE.NOT_OKAY, {}, err.message)
         next();
     }
 }

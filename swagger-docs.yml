@@ -122,15 +122,6 @@ paths:
       operationId: "removeUser"
       parameters:
         - $ref: "#/components/parameters/LanguageHeader"
-        - name: "id"
-          required: true,
-          in: "body"
-          content:
-            application/x-www-form-urlencoded: {}
-          schema:
-            type: "string"
-            example:
-              id: "XXXXXXXXXXXXXXXXXXXXXXXX"
       requestBody:
         content:
           application/json:
@@ -139,8 +130,8 @@ paths:
               example:
                 id: "XXXXXXXXXXXXXXXXXXXXXXXX"
       responses:
-        200:
-          description: "Successful response"
+        204:
+          description: "Successful deleted, no content returned"
           content:
             application/json: {}
         400:
