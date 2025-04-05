@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { createAdmin, getAllAdmins, updateAdminUser, removeUser } from '../services/user.mongo.service.js';
 import { setCustomResponse, mailOptions, objectFilter } from '../utils/helpers/functions.js';
-import { ERROR_TYPES } from '../utils/constants/common.constant.js';
+import { CODE, ERROR_RESP, ERROR_TYPES, STATUS_CODES, SUCCESS_RESP } from '../utils/constants/common.constant.js';
 // import mailService from '../services/mailService.js';
 // // Note: Admin or Clients are same!
 
@@ -9,22 +9,17 @@ import { ERROR_TYPES } from '../utils/constants/common.constant.js';
 const addAdmin = async (req: Request, res: Response, next: NextFunction) => {
     try {
         console.log('invoked addAdmin')
-        const user: any = await createAdmin(req);
+        const user = await createAdmin(req);
         if (user.okay) {
-            console.log('okayy')
             const context = {
                 name: req.body.name,
                 password: user.password
             }
-            setCustomResponse(req, 201, true, 0, user.data, user.message)
+            setCustomResponse(req, STATUS_CODES.CREATED, SUCCESS_RESP, CODE.OKAY, user.data, user.message)
         }
     } catch (err: any) {
         console.error('catch addAdmin', { errName: err.name })
-        if (ERROR_TYPES.VALIDATION_ERROR === err.name) {
-            setCustomResponse(req, 400, false, 1, '', err.message)
-        } else {
-            setCustomResponse(req, 500, false, 1, '', err.message)
-        }
+        setCustomResponse(req, ERROR_TYPES.VALIDATION_ERROR === err.name ? 400 : 500, ERROR_RESP, CODE.NOT_OKAY, {}, err.message)
     } finally {
         console.info('invoked finally addAdmin')
         next();
@@ -33,11 +28,11 @@ const addAdmin = async (req: Request, res: Response, next: NextFunction) => {
 
 const updateAdmin = async (req: Request, res: Response, next: NextFunction) => {
     try {
-        const user: any = await updateAdminUser(req);
-        (user.okay) ? setCustomResponse(req, 200, true, 0, user.data, user.message) : setCustomResponse(req, 400, false, 1, '', user.message);
+        const user = await updateAdminUser(req);
+        (user.okay) ? setCustomResponse(req, 200, SUCCESS_RESP, CODE.OKAY, user.data, user.message) : setCustomResponse(req, 400, ERROR_RESP, CODE.NOT_OKAY, {}, user.message);
         next();
     } catch (err: any) {
-        setCustomResponse(req, 500, false, 1, '', err.message)
+        setCustomResponse(req, 500, ERROR_RESP, CODE.NOT_OKAY, {}, err.message)
         next();
     }
 };
@@ -45,10 +40,10 @@ const updateAdmin = async (req: Request, res: Response, next: NextFunction) => {
 const getAdminsList = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const list: any = await getAllAdmins(req);
-        setCustomResponse(req, 200, true, 0, list, 'success');
+        setCustomResponse(req, 200, SUCCESS_RESP, CODE.OKAY, list, 'success', list.length);
         next();
     } catch (err: any) {
-        setCustomResponse(req, 500, false, 1, '', err.message)
+        setCustomResponse(req, 500, ERROR_RESP, CODE.NOT_OKAY, {}, err.message)
         next();
     }
 }
@@ -182,10 +177,10 @@ const getAdminsList = async (req: Request, res: Response, next: NextFunction) =>
 const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
     try {
         const user = await removeUser(req.body.id);
-        (user.okay) ? setCustomResponse(req, 200, true, 0, user.data, user.message) : setCustomResponse(req, 400, false, 1, '', user.message);
+        (user.okay) ? setCustomResponse(req, 200, SUCCESS_RESP, CODE.OKAY, user.data, user.message) : setCustomResponse(req, 400, ERROR_RESP, CODE.NOT_OKAY, {}, user.message);
         next();
     } catch (err: any) {
-        setCustomResponse(req, 500, false, 1, '', err.message)
+        setCustomResponse(req, 500, ERROR_RESP, CODE.NOT_OKAY, {}, err.message)
         next();
     }
 }

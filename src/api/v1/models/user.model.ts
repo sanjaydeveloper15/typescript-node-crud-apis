@@ -1,4 +1,4 @@
-import {Schema, InferSchemaType, model} from 'mongoose';
+import { Schema, InferSchemaType, model } from 'mongoose';
 import { ROLE } from '../utils/constants/common.constant.js';
 
 const userSchema = new Schema({
@@ -24,13 +24,19 @@ const userSchema = new Schema({
   role: {
     type: String,
     required: true,
-    enum: [ROLE.SUPER_ADMIN, ROLE.EMPLOYEE, ROLE.ADMIN, ROLE.INSTITUTE, ROLE.BANK, ROLE.INSTITUTE_PERSON],
+    enum: Object.values(ROLE),
+    index: true
   },
   logo: { type: String, default: '' },
   code: { type: String, default: '' },
   description: { type: String, default: '' },
   branch: { type: String, default: '' },
   isRemove: { type: Number, default: 0, select: false },
+  deletedAt: { type: Date, default: null },
+  // Auditing fields
+  createdBy: { type: Schema.Types.ObjectId, ref: 'users' },
+  updatedBy: { type: Schema.Types.ObjectId, ref: 'users' },
+  deletedBy: { type: Schema.Types.ObjectId, ref: 'users' },
 }, {
   timestamps: true,
 });

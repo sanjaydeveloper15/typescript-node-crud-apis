@@ -1,11 +1,34 @@
-import { NextFunction, Request, Response } from 'express';
+import { Request } from 'express';
 import userModel from '../models/user.model.js';
-import { hashPassword, checkPassword, objectFilter, generatePassword } from '../utils/helpers/functions.js';
+import { hashPassword, objectFilter, generatePassword, catchException } from '../utils/helpers/functions.js';
 import messages from '../utils/helpers/messages.js';
 import { createUserToken } from '../middlewares/auth.middleware.js';
 import { ROLE } from '../utils/constants/common.constant.js';
+import { Document } from 'mongodb';
 
-const commonSelect = {_id: 1, name: 1, email: 1, countryCode: 1, mobile: 1, profileImage: 1, role: 1, employeeType: 1, employeeQualification: 1, address: 1, createdAt: 1};
+interface BaseUser {
+    _id?: string;
+    name: string;
+    email: string;
+    password: string;
+    role: string;
+    countryCode: string;
+    mobile: string;
+    employeeType?: string;
+    employeeQualification?: string;
+    address?: string;
+    createdAt?: Date;
+    profileImage?: string;
+}
+
+interface UserResp {
+    okay: boolean;
+    message: string;
+    data: any;
+    password?: string;
+}
+
+const commonSelect: Partial<Record<keyof BaseUser, number>> = { _id: 1, name: 1, email: 1, countryCode: 1, mobile: 1, profileImage: 1, role: 1, employeeType: 1, employeeQualification: 1, address: 1, createdAt: 1 };
 
 // const imgPath = "/assets/uploads/images/";
 
@@ -13,9 +36,99 @@ const commonSelect = {_id: 1, name: 1, email: 1, countryCode: 1, mobile: 1, prof
 // 	return await userModel.find();
 // }
 
-const getAllAdmins = async(req: Request) => {
-    let condition = (req.query.employeeType) ? { 'role':ROLE.ADMIN, 'employeeType':req.query.employeeType }: {'role':ROLE.ADMIN};
-	return await userModel.find(condition).select(commonSelect);
+interface AdminWhere extends BaseUser {
+    employeeType?: any
+}
+
+const getAllAdmins = async (req: Request): Promise<Document> => {
+    try {
+        const { employeeType } = req.query
+        const condition: Partial<AdminWhere> = employeeType ? { role: ROLE.ADMIN, employeeType: employeeType } : { role: ROLE.ADMIN };
+        return await userModel.find(condition).select(commonSelect);
+    } catch (err: unknown) {
+        catchException(err)
+        throw new Error("Error in service > getAllAdmins");
+    }
+}
+
+const getUser = async (id: string, token: string = ''): Promise<Document> => {
+    try {
+        const user: any = await userModel.findOne({ _id: id }).select({
+            _id: 1, name: 1, email: 1, countryCode: 1, mobile: 1, profileImage: 1, role: 1, employeeType: 1, employeeQualification: 1, address: 1, createdAt: 1
+        }).lean(); // returns a plan JS object
+        if (user && !!token) user.token = token;
+        return user;
+    } catch (err: unknown) {
+        catchException(err)
+        throw new Error("Error in service > getUser");
+    }
+}
+interface NewUserObject extends BaseUser {
+    password: string;
+}
+
+const createAdmin = async (req: Request): Promise<UserResp> => {
+    try {
+        const password = await generatePassword(10); // generate random password first time, then user will reset themselves
+
+        const prepareObject: NewUserObject = {
+            password: await hashPassword(password),
+            email: req.body.email,
+            name: req.body.name,
+            role: ROLE.ADMIN,
+            countryCode: req.body.countryCode,
+            mobile: req.body.mobile,
+            employeeType: req.body.employeeType
+        };
+        let user = await userModel.create(prepareObject);
+
+        const token: string = await createUserToken(user.id, user.email, ROLE.ADMIN);
+        return {
+            data: await getUser(user.id, token),
+            okay: true,
+            message: messages('en')['signup'],
+            password: password
+        }
+    } catch (err: unknown) {
+        catchException(err)
+        throw new Error("Error in service > createAdmin");
+    }
+};
+
+const updateAdminUser = async (req: Request): Promise<UserResp> => {
+    try {
+        const prepareObject: Partial<BaseUser> = {
+            email: req.body.email,
+            name: req.body.name,
+            role: ROLE.ADMIN,
+            countryCode: req.body.countryCode,
+            mobile: req.body.mobile
+        };
+        const updateResp = await userModel.findOneAndUpdate({ "_id": req.body.userId }, objectFilter(prepareObject))
+        return {
+            data: updateResp ? await getUser(req.body.userId) : {},
+            okay: updateResp ? true : false,
+            message: updateResp ? messages('en')['user_updated'] : messages('en')['user_not_found']
+        }
+    } catch (err: unknown) {
+        catchException(err)
+        throw new Error("Error in service > updateAdminUser");
+    }
+};
+
+const removeUser = async (userId: string): Promise<UserResp> => {
+    try {
+        const deleteUsr = await userModel.deleteOne({ '_id': userId });
+        
+        return {
+            data: {},
+            okay: deleteUsr.deletedCount ? true : false,
+            message: deleteUsr.deletedCount ? messages('en')['user_deleted'] : messages('en')['user_not_found']
+        }
+    } catch (err: unknown) {
+        catchException(err)
+        throw new Error("Error in service > removeUser");
+    }
 }
 
 // const getAllEmployess = async(req) => {
@@ -40,72 +153,6 @@ const getAllAdmins = async(req: Request) => {
 // 	let condition = (req.query.userId) ? {'role':ROLE.INSTITUTE_PERSON, 'userId':req.query.userId} : {'role':ROLE.INSTITUTE_PERSON}; 
 // 	return await userModel.find(condition).select(commonSelect);
 // }
-
-const getUser = async(id:string,token:string = '') => {
-	let resultObj:any = {};
-	const user:any = await userModel.findOne({'_id':id})
-
-	resultObj.id = user.id;
-	resultObj.name = user.name;
-	resultObj.countryCode = user.countryCode;
-    resultObj.mobile = user.mobile;
-	resultObj.profileImage = user.profileImage;
-	resultObj.role = user.role;
-	resultObj.email = user.email;
-	resultObj.employeeType = user.employeeType;
-	resultObj.employeeQualification = user.employeeQualification;
-    resultObj.address = user.address;
-
-	resultObj.createdAt = user.createdAt;
-	if(token != '') resultObj.token = token;
-
-	return resultObj;
-}
-
-const createAdmin = async (req: Request) => {
-    let resultObj:any = {},
-        password = await generatePassword(10);
-
-    const prepareObject = {
-        password: await hashPassword(password),
-        email: req.body.email,
-        name: req.body.name,
-        role: ROLE.ADMIN,
-        // superAdminId: req.user.id,
-        // adminId: req.user.id,
-        // parentId: req.user.id,
-        countryCode: req.body.countryCode,
-        mobile: req.body.mobile,
-        employeeType: req.body.employeeType,
-        // profileImage: (req.file) ? imgPath + req.file.filename : ''
-    };
-    let user = await userModel.create(prepareObject);
-
-    let token = await createUserToken(user.id, user.email, ROLE.ADMIN);
-    resultObj.data = await getUser(user.id, token);
-    resultObj.okay = true;
-    resultObj.message = messages('en')['signup'];
-    resultObj.password = password;
-    return resultObj;
-};
-
-const updateAdminUser = async (req: Request) => {
-	let resultObj:any = {};
-
-    const prepareObject = {
-        email: req.body.email,
-        name: req.body.name,
-        role: ROLE.ADMIN,
-        countryCode: req.body.countryCode,
-        mobile: req.body.mobile
-    };
-	await userModel.findOneAndUpdate({"_id":req.body.userId},await objectFilter(prepareObject))
-
-    resultObj.data = await getUser(req.body.userId);
-    resultObj.okay = true;
-    resultObj.message = messages('en')['user_updated'];
-	return resultObj;
-};
 
 // const createEmployee = async (req) => {
 // 	let resultObj = {},
@@ -200,7 +247,7 @@ const updateAdminUser = async (req: Request) => {
 // 		employeeQualification: req.body.employeeQualification,
 //         profileImage: (req.file) ? imgPath + req.file.filename : ''
 //     };
-//     await userModel.findOneAndUpdate({"_id":req.body.userId},await objectFilter(prepareObject))
+//     await userModel.findOneAndUpdate({"_id":req.body.userId},objectFilter(prepareObject))
 
 //     resultObj.data = await getUser(req.body.userId);
 //     resultObj.okay = true;
@@ -248,7 +295,7 @@ const updateAdminUser = async (req: Request) => {
 //         address: req.body.address,
 //         profileImage: (req.file) ? imgPath + req.file.filename : ''
 //     };
-//     await userModel.findOneAndUpdate({"_id":req.body.userId},await objectFilter(prepareObject))
+//     await userModel.findOneAndUpdate({"_id":req.body.userId},objectFilter(prepareObject))
 
 //     resultObj.data = await getUser(req.body.userId);
 //     resultObj.okay = true;
@@ -269,26 +316,13 @@ const updateAdminUser = async (req: Request) => {
 //         address: req.body.address,
 //         profileImage: (req.file) ? imgPath + req.file.filename : ''
 //     };
-//     await userModel.findOneAndUpdate({"_id":req.body.userId},await objectFilter(prepareObject));
+//     await userModel.findOneAndUpdate({"_id":req.body.userId},objectFilter(prepareObject));
 
 //     resultObj.data = await getUser(req.body.userId);
 //     resultObj.okay = true;
 //     resultObj.message = messages('en')['user_updated'];
 // 	return resultObj;
 // }
-
-const removeUser = async (userId:string) => {
-    let deleteUsr = await userModel.deleteOne({'_id':userId});
-    let resultObj:any = {};
-    if(deleteUsr){
-        resultObj.okay = true;
-        resultObj.message = messages('en')['user_deleted'];
-    }else{
-        resultObj.okay = false;
-        resultObj.message = 'User not found.';
-    }
-    return resultObj;
-}
 
 // const updatePassword = async (userId, password) => {
 //     return await userModel.updateOne({'_id': userId},{'password': await hashPassword(password)});

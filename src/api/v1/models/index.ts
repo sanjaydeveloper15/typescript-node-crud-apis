@@ -1,22 +1,32 @@
 import mongoose from 'mongoose'
 import User from './user.model.js'
-// import Bank from './bankModel.js'
+import { NODE_ENV } from '../utils/constants/common.constant.js';
+import { catchException } from '../utils/helpers/functions.js';
 
+interface IDbServer {
+  appName: string;
+  dbHostLocal: string;
+  dbPort: number;
+  port: number;
+}
 
-const server = {
-  "appName": "CRUD API's with TypeScript",
-  "dbHostLocal": "mongodb://localhost:27017/dev",
-  "dbPort": 3306,
-  "port": 5003
+const server: IDbServer = {
+  appName: "CRUD API's with TypeScript",
+  dbHostLocal: "mongodb://localhost:27017/dev",
+  dbPort: 3306,
+  port: 5003
 }
 
 const connectDb = () => {
-  const connect = mongoose.connect(server.dbHostLocal).then(
-    () => { console.log('Yeah, Database is connected') },
-    (err:any) => { console.log(`Can not connect to the database ${err}`) },
-  )
-
-  mongoose.set('debug', true)
+  const connect = mongoose.connect(server.dbHostLocal)
+    .then(() => {
+      console.info('Database is connected!')
+    }).catch((err: unknown) => {
+      catchException(err)
+    })
+  if (NODE_ENV.DEVELOPMENT === process.env.NODE_ENV) {
+    mongoose.set('debug', true) // print queries
+  }
   return connect
 }
 

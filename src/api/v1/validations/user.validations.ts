@@ -3,7 +3,7 @@ import { Request, Response, NextFunction } from 'express'
 import { validate, validations, uniqueWithIgnore } from './index.js';
 
 const signupValidator = async (req:Request, res:Response, next: NextFunction) => {
-console.log(req.body)
+
     const v = new Validator(req.body, {
         name: validations.name,
         email: validations.uniqueEmail,
@@ -20,7 +20,7 @@ const updateValidator = async (req: Request, res: Response, next: NextFunction) 
         const v = new Validator(req.body, {
             userId: validations.userIdExists,
             name: validations.name,
-            email: validations.email,
+            email: validations.uniqueSelfIgnoreEmail,
             countryCode: validations.countryCode,
             mobile: validations.mobile
         })
