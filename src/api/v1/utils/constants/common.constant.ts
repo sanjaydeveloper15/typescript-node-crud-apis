@@ -94,3 +94,10 @@ export enum CODE {
     OKAY = 0,
     NOT_OKAY = 1
 }
+
+export enum SERVICE_TYPE {
+    EMAIL = 'email',
+    SMS = 'sms',
+    PUSH = 'push',
+    SERVER = 'node-server'
+}

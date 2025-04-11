@@ -13,9 +13,12 @@ import { serve as serveSwagger, setup as setupSwagger } from 'swagger-ui-express
 import { readFileSync } from 'fs'
 // import messages from './src/api/v1/utils/helpers/messages.js'
 import helmet from 'helmet'
+import WinstonLogger from './src/api/v1/logger/winston.js'
+import { SERVICE_TYPE } from './src/api/v1/utils/constants/common.constant.js'
 
 const app: Application = express()
 const port: number = Number(process.env.SERVER_PORT) || 3001
+const Logger = new WinstonLogger()
 
 // Middlewares
 app.use(cors()) // enabling CORS
@@ -53,9 +56,9 @@ app.use((req: Request, res: Response) => {
 //if connect db & listen server on mentioned port
 connectDb().then(async () => {
   app.listen({ port }, () => {
-    console.log(`Yeah, ${process.env.APP_NAME} listening on port ${port}!`)
+    Logger.info(SERVICE_TYPE.SERVER, `Yeah, ${process.env.APP_NAME} listening on port ${port}!`)
   })
 }).catch((error) => {
-  console.error(`Database connection failed!`)
+  Logger.error(SERVICE_TYPE.SERVER, `Database connection failed!`, { error })
   process.exit(1) // terminate Node.js process
 })

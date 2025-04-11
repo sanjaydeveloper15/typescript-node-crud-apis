@@ -1,14 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
 import { createAdmin, getAllAdmins, updateAdminUser, removeUser } from '../services/user.mongo.service.js';
-import { setCustomResponse, mailOptions, objectFilter } from '../utils/helpers/functions.js';
-import { CODE, ERROR_RESP, ERROR_TYPES, STATUS_CODES, SUCCESS_RESP } from '../utils/constants/common.constant.js';
+import { setCustomResponse, catchException, getCatchErrorMsg } from '../utils/helpers/functions.js';
+import { CODE, ERROR_RESP, ERROR_TYPES, SERVICE_TYPE, STATUS_CODES, SUCCESS_RESP } from '../utils/constants/common.constant.js';
+import WinstonLogger from '../logger/winston.js';
+const Logger = new WinstonLogger()
 // import mailService from '../services/mailService.js';
 // // Note: Admin or Clients are same!
 
 
-const addAdmin = async (req: Request, res: Response, next: NextFunction) => {
+const addAdmin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        console.log('invoked addAdmin')
+        Logger.info(SERVICE_TYPE.PUSH, `addAdmin invoked`, req.body)
         const user = await createAdmin(req);
         if (user.okay) {
             const context = {
@@ -17,33 +19,33 @@ const addAdmin = async (req: Request, res: Response, next: NextFunction) => {
             }
             setCustomResponse(req, STATUS_CODES.CREATED, SUCCESS_RESP, CODE.OKAY, user.data, user.message)
         }
-    } catch (err: any) {
-        console.error('catch addAdmin', { errName: err.name })
-        setCustomResponse(req, ERROR_TYPES.VALIDATION_ERROR === err.name ? STATUS_CODES.BAD_REQUEST : STATUS_CODES.INTERNAL_SERVER_ERROR, ERROR_RESP, CODE.NOT_OKAY, {}, err.message)
+    } catch (err: unknown) {
+        const ErrorName = err instanceof Error ? err.name : 'no-error-name';
+        catchException(err)
+        setCustomResponse(req, ERROR_TYPES.VALIDATION_ERROR === ErrorName ? STATUS_CODES.BAD_REQUEST : STATUS_CODES.INTERNAL_SERVER_ERROR, ERROR_RESP, CODE.NOT_OKAY, {}, getCatchErrorMsg(err))
     } finally {
-        console.info('invoked finally addAdmin')
         next();
     }
 };
 
-const updateAdmin = async (req: Request, res: Response, next: NextFunction) => {
+const updateAdmin = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const user = await updateAdminUser(req);
         (user.okay) ? setCustomResponse(req, STATUS_CODES.SUCCESS, SUCCESS_RESP, CODE.OKAY, user.data, user.message) : setCustomResponse(req, 400, ERROR_RESP, CODE.NOT_OKAY, {}, user.message);
         next();
-    } catch (err: any) {
-        setCustomResponse(req, STATUS_CODES.INTERNAL_SERVER_ERROR, ERROR_RESP, CODE.NOT_OKAY, {}, err.message)
+    } catch (err: unknown) {
+        setCustomResponse(req, STATUS_CODES.INTERNAL_SERVER_ERROR, ERROR_RESP, CODE.NOT_OKAY, {}, getCatchErrorMsg(err))
         next();
     }
 };
 
-const getAdminsList = async (req: Request, res: Response, next: NextFunction) => {
+const getAdminsList = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const list: any = await getAllAdmins(req);
         setCustomResponse(req, STATUS_CODES.SUCCESS, SUCCESS_RESP, CODE.OKAY, list, 'success', list.length);
         next();
-    } catch (err: any) {
-        setCustomResponse(req, STATUS_CODES.INTERNAL_SERVER_ERROR, ERROR_RESP, CODE.NOT_OKAY, {}, err.message)
+    } catch (err: unknown) {
+        setCustomResponse(req, STATUS_CODES.INTERNAL_SERVER_ERROR, ERROR_RESP, CODE.NOT_OKAY, {}, getCatchErrorMsg(err))
         next();
     }
 }
@@ -174,13 +176,13 @@ const getAdminsList = async (req: Request, res: Response, next: NextFunction) =>
 //     }
 // };
 
-const deleteUser = async (req: Request, res: Response, next: NextFunction) => {
+const deleteUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const user = await removeUser(req.body.id);
         user.okay ? setCustomResponse(req, STATUS_CODES.NO_CONTENT, SUCCESS_RESP, CODE.OKAY, user.data, user.message) : setCustomResponse(req, 400, ERROR_RESP, CODE.NOT_OKAY, {}, user.message);
         next();
-    } catch (err: any) {
-        setCustomResponse(req, STATUS_CODES.INTERNAL_SERVER_ERROR, ERROR_RESP, CODE.NOT_OKAY, {}, err.message)
+    } catch (err: unknown) {
+        setCustomResponse(req, STATUS_CODES.INTERNAL_SERVER_ERROR, ERROR_RESP, CODE.NOT_OKAY, {}, getCatchErrorMsg(err))
         next();
     }
 }

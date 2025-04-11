@@ -12,7 +12,7 @@ interface IDbServer {
 
 const server: IDbServer = {
   appName: "CRUD API's with TypeScript",
-  dbHostLocal: "mongodb://localhost:27017/dev",
+  dbHostLocal: process.env.DB_CONN_URI || "",
   dbPort: 3306,
   port: 5003
 }
@@ -23,6 +23,7 @@ const connectDb = () => {
       console.info('Database is connected!')
     }).catch((err: unknown) => {
       catchException(err)
+      throw err
     })
   if (NODE_ENV.DEVELOPMENT === process.env.NODE_ENV) {
     mongoose.set('debug', true) // print queries

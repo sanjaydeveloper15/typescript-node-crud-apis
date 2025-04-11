@@ -3,7 +3,11 @@ import bcrypt from 'bcryptjs';
 import generator from 'generate-password';
 import messages from './messages.js';
 import dotenv from 'dotenv'
+import WinstonLogger from '../../logger/winston.js';
+import { SERVICE_TYPE } from '../constants/common.constant.js';
+import { error } from 'console';
 dotenv.config() //for calling process.env.VAR_NAME globally
+const Logger = new WinstonLogger()
 interface MailServiceConfig {
     service: string;
     host: string;
@@ -55,7 +59,6 @@ const hashPassword = async (password: string): Promise<string> => {
 
 const getErrorMessage = (req: Request, errors: any): string => {
     try {
-        // console.log(errors)
         req.body.language = getReqLang(req)
         for (let key in errors) {
             let rule = errors[key]['rule'],
@@ -78,7 +81,7 @@ const convertDynamicVarLang = (lang: string, varr: string): string => {
 }
 
 const setCustomResponse = (req: Request, statusCode: number = 200, status: boolean = false, code: number = 1, data: any = null, msg: string = '', totalCount: number = 0): void => {
-    console.log(`custom resp msg => ${msg}, statusCode => ${statusCode}`)
+    Logger.info(SERVICE_TYPE.PUSH,`custom resp msg => ${msg}, statusCode => ${statusCode}`)
     req.body.status = status
     req.body.data = (!!data) ? data : {}
     req.body.totalCount = totalCount
@@ -90,8 +93,8 @@ const setCustomResponse = (req: Request, statusCode: number = 200, status: boole
 const checkPassword = async (password: string, hash: string): Promise<boolean> => {
     try {
         return await bcrypt.compare(password, hash) // gives boolean response always
-    } catch (err) {
-        console.log('checkPassword', err)
+    } catch (err: unknown) {
+        Logger.error(SERVICE_TYPE.SERVER, err instanceof Error ? err.message : '', err);
         return false
     }
 }
@@ -160,10 +163,17 @@ const shouldNotEmpty = (val: string): boolean => {
 
 const catchException = (error: unknown): void => {
     if (error instanceof Error) {
-        console.error("Error:", error.message);
-        console.error("Stack trace:", error.stack);
+        Logger.error(SERVICE_TYPE.SERVER, `Error: ${error.message}, Stack: ${error.stack}`, error);
     } else {
-        console.error("An unknown error occurred:", error);
+        Logger.error(SERVICE_TYPE.SERVER, `An unknown error occurred: ${error}`, error);
+    }
+}
+
+const getCatchErrorMsg = (error: unknown): string => {
+    if (error instanceof Error) {
+        return error.message;
+    } else {
+        return 'An unknown error occurred';
     }
 }
 
@@ -181,5 +191,6 @@ export {
     mailServiceObj,
     objectFilter,
     shouldNotEmpty,
-    catchException
+    catchException,
+    getCatchErrorMsg
 }
